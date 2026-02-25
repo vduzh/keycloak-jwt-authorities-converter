@@ -107,15 +107,12 @@ publishing {
 }
 
 signing {
+    required = false
     def signingKey = System.getenv("GPG_SIGNING_KEY")
     def signingPassword = System.getenv("GPG_SIGNING_PASSWORD")
     if (signingKey && signingPassword) {
         useInMemoryPgpKeys(signingKey, signingPassword)
+        required = { gradle.taskGraph.hasTask(':publishMavenJavaPublicationToCentralRepository') }
     }
     sign publishing.publications.mavenJava
-}
-
-// Sign only when publishing to Central
-tasks.withType(Sign).configureEach {
-    onlyIf { gradle.taskGraph.hasTask(':publishMavenJavaPublicationToCentralRepository') }
 }
