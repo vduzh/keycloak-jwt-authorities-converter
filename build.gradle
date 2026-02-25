@@ -1,0 +1,121 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+    alias(libs.plugins.springBoot)
+    alias(libs.plugins.springDependencyManagement)
+}
+
+// Disable bootJar for library
+bootJar {
+    enabled = false
+}
+
+// Remove plain classifier for jar
+jar {
+    archiveClassifier = ''
+}
+
+group = 'io.github.vduzh'
+version = '0.1.0-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+    withSourcesJar()
+    withJavadocJar()
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            pom {
+                name = 'Keycloak JWT Authorities Converter'
+                description = 'Spring Security converter that extracts granted authorities from Keycloak JWT tokens'
+                url = 'https://github.com/vduzh/keycloak-jwt-authorities-converter'
+
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'vduzh'
+                        name = 'vduzh'
+                        url = 'https://github.com/vduzh'
+                    }
+                }
+
+                scm {
+                    url = 'https://github.com/vduzh/keycloak-jwt-authorities-converter'
+                    connection = 'scm:git:git://github.com/vduzh/keycloak-jwt-authorities-converter.git'
+                    developerConnection = 'scm:git:ssh://github.com/vduzh/keycloak-jwt-authorities-converter.git'
+                }
+            }
+
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionResult()
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = 'nexus'
+            def path = version.toString().endsWith("SNAPSHOT") ? "maven-snapshots" : "maven-releases"
+            url = System.getenv("NEXUS_URL") ?: "http://localhost:8081/repository/" + path
+            allowInsecureProtocol = true
+            credentials {
+                username = System.getenv("NEXUS_USERNAME") ?: 'admin'
+                password = System.getenv("NEXUS_PASSWORD") ?: 'admin123'
+            }
+        }
+        maven {
+            name = 'central'
+            url = "https://central.sonatype.com/repository/maven-releases/"
+            credentials {
+                username = System.getenv("MAVEN_CENTRAL_USERNAME") ?: ''
+                password = System.getenv("MAVEN_CENTRAL_PASSWORD") ?: ''
+            }
+        }
+    }
+}
+
+signing {
+    def signingKey = System.getenv("GPG_SIGNING_KEY")
+    def signingPassword = System.getenv("GPG_SIGNING_PASSWORD")
+    if (signingKey && signingPassword) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+    }
+    sign publishing.publications.mavenJava
+}
+
+// Sign only when publishing to Central
+tasks.withType(Sign).configureEach {
+    onlyIf { gradle.taskGraph.hasTask(':publishMavenJavaPublicationToCentralRepository') }
+}

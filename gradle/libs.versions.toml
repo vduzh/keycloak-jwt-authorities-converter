@@ -1,0 +1,8 @@
+# gradle/libs.versions.toml
+[versions]
+springBoot = "3.5.11"
+springDependencyManagement = "1.1.7"
+
+[plugins]
+springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
+springDependencyManagement = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
