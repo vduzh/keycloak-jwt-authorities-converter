@@ -70,6 +70,7 @@ The converter produces: `ROLE_admin`, `ROLE_user`.
 ./gradlew build      # Build + tests
 ./gradlew test       # Run tests
 ./gradlew publish    # Publish to Nexus
+./gradlew publish -Pcentral  # Publish to Nexus + Maven Central
 ```
 
 ## License

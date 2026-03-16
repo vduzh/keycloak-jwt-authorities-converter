@@ -95,12 +95,14 @@ publishing {
                 password = System.getenv("NEXUS_PASSWORD") ?: "admin123"
             }
         }
-        maven {
-            name = "central"
-            url = uri("https://central.sonatype.com/repository/maven-releases/")
-            credentials {
-                username = System.getenv("MAVEN_CENTRAL_USERNAME") ?: ""
-                password = System.getenv("MAVEN_CENTRAL_PASSWORD") ?: ""
+        if (project.hasProperty("central")) {
+            maven {
+                name = "central"
+                url = uri("https://central.sonatype.com/repository/maven-releases/")
+                credentials {
+                    username = System.getenv("MAVEN_CENTRAL_USERNAME") ?: ""
+                    password = System.getenv("MAVEN_CENTRAL_PASSWORD") ?: ""
+                }
             }
         }
     }
