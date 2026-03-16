@@ -17,7 +17,7 @@ tasks.jar {
 }
 
 group = "io.github.vduzh"
-version = "0.1.1"
+version = "0.1.2"
 
 java {
     toolchain {
@@ -40,6 +40,10 @@ dependencies {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+}
+
+tasks.withType<PublishToMavenRepository>().configureEach {
+    dependsOn(tasks.named("check"))
 }
 
 publishing {
