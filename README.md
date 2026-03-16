@@ -67,13 +67,9 @@ The converter produces: `ROLE_admin`, `ROLE_user`.
 ## Building
 
 ```bash
-./gradlew build
-```
-
-## Testing
-
-```bash
-./gradlew test
+./gradlew build      # Build + tests
+./gradlew test       # Run tests
+./gradlew publish    # Publish to Nexus
 ```
 
 ## License
